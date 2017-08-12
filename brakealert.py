@@ -3,7 +3,7 @@
 from datetime import datetime
 import obd, sys, time
 
-brake_delta = 0.3
+brake_delta = 0.2
 accel_delta = 0.3
 
 port = sys.argv[1]
@@ -26,14 +26,16 @@ tps = 1
 
 while 1:
 	speedres = conn.query(speedcmd)
-	speednow = speedres.value.to("mph").magnitude
+	if not speedres.is_null():
+		speednow = speedres.value.to("mph").magnitude
 	if(speed > 15):
 		if(((speed - speednow) / speed) > brake_delta):
 			print("BRAKE ALERT!!!!\a\a\a")
 	speed = speednow
 	print '{0}: Speed {1}'.format(str(datetime.utcnow()), speednow)	
 	tpsres = conn.query(tpscmd)
-	tps = tpsres.value.magnitude
+	if not tpsres.is_null():
+		tps = tpsres.value.magnitude
 	if(tps > 50):
 		print("HARD ACCELERATION\a\a\a")
 	print '{0}: Throttle {1}'.format(str(datetime.utcnow()), tps)
